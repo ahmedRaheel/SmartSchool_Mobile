@@ -1,3 +1,224 @@
-import { useMemo,useState } from "react";import { Pressable,StyleSheet,Text,TextInput,View } from "react-native";import { Ionicons } from "@expo/vector-icons";import { NativeStackScreenProps } from "@react-navigation/native-stack";import { RootStackParamList } from "../navigation/types";import { Screen } from "../components/Screen";import { Header,MetricCard,Pill } from "../components/ui";import { modules } from "../mocks/moduleData";import { theme } from "../theme/theme";import { useApp } from "../app/AppProvider";
-export function ModuleScreen({route,navigation}:NativeStackScreenProps<RootStackParamList,"Module">){const data=modules[route.params.moduleKey];const{notify}=useApp();const[q,setQ]=useState("");const filtered=useMemo(()=>data.records.filter(x=>`${x.title} ${x.subtitle} ${x.meta} ${x.status}`.toLowerCase().includes(q.toLowerCase())),[q,data]);return <Screen><Header title={data.title} subtitle={data.subtitle} right={<Pressable onPress={()=>navigation.goBack()}><Ionicons name="close" size={24}/></Pressable>}/><Pressable style={s.action} onPress={()=>navigation.navigate("CreateRecord",{moduleKey:data.key})}><Ionicons name="add" size={18} color="white"/><Text style={s.actionText}>{data.action}</Text></Pressable><View style={s.metrics}>{data.metrics.map(m=><MetricCard key={m.label} {...m} onPress={()=>notify(`${m.label}: ${m.value}`)}/>)}</View><View style={s.search}><Ionicons name="search" size={18} color={theme.colors.muted}/><TextInput value={q} onChangeText={setQ} placeholder={`Search ${data.title.toLowerCase()}...`} style={s.input}/></View><Text style={s.heading}>Records</Text>{filtered.map(r=><Pressable key={r.id} style={s.record} onPress={()=>navigation.navigate("RecordDetail",{moduleKey:data.key,record:r})}><View style={{flex:1}}><Text style={s.recordTitle}>{r.title}</Text><Text style={s.recordSub}>{r.subtitle} • {r.meta}</Text></View><View style={s.right}><Pill text={r.status}/><Text style={s.value}>{r.value}</Text></View><Ionicons name="chevron-forward" size={18} color={theme.colors.muted}/></Pressable>)}<Text style={s.heading}>Smart insights</Text>{data.insights.map(i=><Pressable key={i} style={s.insight} onPress={()=>notify(i)}><Ionicons name="bulb-outline" size={18} color={theme.colors.warning}/><Text style={s.insightText}>{i}</Text></Pressable>)}</Screen>}
-const s=StyleSheet.create({action:{alignSelf:"flex-start",flexDirection:"row",gap:7,backgroundColor:theme.colors.primary,paddingHorizontal:13,paddingVertical:10,borderRadius:11,marginBottom:15},actionText:{color:"white",fontWeight:"800",fontSize:11},metrics:{flexDirection:"row",flexWrap:"wrap",justifyContent:"space-between"},search:{height:46,flexDirection:"row",alignItems:"center",gap:8,backgroundColor:"white",borderWidth:1,borderColor:theme.colors.line,borderRadius:12,paddingHorizontal:12,marginVertical:10},input:{flex:1},heading:{fontSize:15,fontWeight:"800",color:theme.colors.text,marginTop:14,marginBottom:8},record:{backgroundColor:"white",borderWidth:1,borderColor:theme.colors.line,borderRadius:14,padding:13,marginBottom:9,flexDirection:"row",alignItems:"center",gap:8},recordTitle:{fontWeight:"800",color:theme.colors.text},recordSub:{fontSize:10,color:theme.colors.muted,marginTop:4},right:{alignItems:"flex-end",gap:5},value:{fontSize:10,fontWeight:"700",color:theme.colors.text},insight:{flexDirection:"row",gap:9,backgroundColor:"#FFF9EE",padding:12,borderRadius:12,marginBottom:8},insightText:{flex:1,fontSize:11,color:theme.colors.text,lineHeight:17}})
+import { Ionicons } from '@expo/vector-icons';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useMemo, useState } from 'react';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useApp } from '../app/AppProvider';
+import { Screen } from '../components/Screen';
+import { Header, MetricCard, Pill } from '../components/ui';
+import { modules } from '../mocks/moduleData';
+import { RootStackParamList } from '../navigation/types';
+import { theme } from '../theme/theme';
+
+export function ModuleScreen({
+  route,
+  navigation,
+}: NativeStackScreenProps<RootStackParamList, 'Module'>) {
+  const module = modules[route.params.moduleKey];
+  const { notify, records } = useApp();
+  const [searchText, setSearchText] = useState('');
+
+  if (!module) {
+    return null;
+  }
+
+  const moduleRecords = records[module.key] ?? [];
+
+  const filteredRecords = useMemo(() => {
+    const normalizedSearchText = searchText.trim().toLowerCase();
+
+    if (!normalizedSearchText) {
+      return moduleRecords;
+    }
+
+    return moduleRecords.filter((record) =>
+      [record.title, record.subtitle, record.meta, record.status, record.value]
+        .join(' ')
+        .toLowerCase()
+        .includes(normalizedSearchText),
+    );
+  }, [moduleRecords, searchText]);
+
+  return (
+    <Screen>
+      <Header
+        title={module.title}
+        subtitle={module.subtitle}
+        right={
+          <Pressable onPress={() => navigation.goBack()}>
+            <Ionicons name="close" size={24} />
+          </Pressable>
+        }
+      />
+
+      <Pressable
+        style={styles.action}
+        onPress={() =>
+          navigation.navigate('CreateRecord', {
+            moduleKey: module.key,
+          })
+        }
+      >
+        <Ionicons name="add" size={18} color="white" />
+        <Text style={styles.actionText}>{module.action}</Text>
+      </Pressable>
+
+      <View style={styles.metrics}>
+        {module.metrics.map((metric) => (
+          <MetricCard
+            key={metric.label}
+            {...metric}
+            onPress={() => notify(`${metric.label}: ${metric.value}`)}
+          />
+        ))}
+      </View>
+
+      <View style={styles.search}>
+        <Ionicons name="search" size={18} color={theme.colors.muted} />
+        <TextInput
+          value={searchText}
+          onChangeText={setSearchText}
+          placeholder={`Search ${module.title.toLowerCase()}...`}
+          style={styles.input}
+        />
+      </View>
+
+      <Text style={styles.heading}>Records</Text>
+
+      {filteredRecords.map((record) => (
+        <Pressable
+          key={record.id}
+          style={styles.record}
+          onPress={() =>
+            navigation.navigate('RecordDetail', {
+              moduleKey: module.key,
+              recordId: record.id,
+            })
+          }
+        >
+          <View style={styles.recordContent}>
+            <Text style={styles.recordTitle}>{record.title}</Text>
+            <Text style={styles.recordSubtitle}>
+              {record.subtitle} • {record.meta}
+            </Text>
+          </View>
+          <View style={styles.recordSummary}>
+            <Pill text={record.status} />
+            <Text style={styles.recordValue}>{record.value}</Text>
+          </View>
+          <Ionicons
+            name="chevron-forward"
+            size={18}
+            color={theme.colors.muted}
+          />
+        </Pressable>
+      ))}
+
+      <Text style={styles.heading}>Smart insights</Text>
+      {module.insights.map((insight) => (
+        <Pressable
+          key={insight}
+          style={styles.insight}
+          onPress={() => notify(insight)}
+        >
+          <Ionicons
+            name="bulb-outline"
+            size={18}
+            color={theme.colors.warning}
+          />
+          <Text style={styles.insightText}>{insight}</Text>
+        </Pressable>
+      ))}
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  action: {
+    alignSelf: 'flex-start',
+    backgroundColor: theme.colors.primary,
+    borderRadius: 11,
+    flexDirection: 'row',
+    gap: 7,
+    marginBottom: 15,
+    paddingHorizontal: 13,
+    paddingVertical: 10,
+  },
+  actionText: {
+    color: 'white',
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  metrics: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  search: {
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderColor: theme.colors.line,
+    borderRadius: 12,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: 8,
+    height: 46,
+    marginVertical: 10,
+    paddingHorizontal: 12,
+  },
+  input: {
+    flex: 1,
+  },
+  heading: {
+    color: theme.colors.text,
+    fontSize: 15,
+    fontWeight: '800',
+    marginBottom: 8,
+    marginTop: 14,
+  },
+  record: {
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderColor: theme.colors.line,
+    borderRadius: 14,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 9,
+    padding: 13,
+  },
+  recordContent: {
+    flex: 1,
+  },
+  recordTitle: {
+    color: theme.colors.text,
+    fontWeight: '800',
+  },
+  recordSubtitle: {
+    color: theme.colors.muted,
+    fontSize: 10,
+    marginTop: 4,
+  },
+  recordSummary: {
+    alignItems: 'flex-end',
+    gap: 5,
+  },
+  recordValue: {
+    color: theme.colors.text,
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  insight: {
+    backgroundColor: '#FFF9EE',
+    borderRadius: 12,
+    flexDirection: 'row',
+    gap: 9,
+    marginBottom: 8,
+    padding: 12,
+  },
+  insightText: {
+    color: theme.colors.text,
+    flex: 1,
+    fontSize: 11,
+    lineHeight: 17,
+  },
+});

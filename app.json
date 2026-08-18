@@ -6,21 +6,8 @@
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.smartschool.mobile"
-    },
-    "android": {
-      "package": "com.smartschool.mobile",
-      "adaptiveIcon": {
-        "backgroundColor": "#F4F7FB"
-      }
-    },
-    "web": {
-      "bundler": "metro"
-    },
-    "plugins": [
-      "expo-asset"
-    ]
+    "ios": {"supportsTablet": true, "bundleIdentifier": "com.smartschool.mobile"},
+    "android": {"package": "com.smartschool.mobile", "adaptiveIcon": {"backgroundColor": "#F4F7FB"}},
+    "web": {"bundler": "metro"}
   }
 }

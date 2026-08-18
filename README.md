@@ -1,50 +1,41 @@
-# SmartSchool Mobile
+# SmartSchool Mobile v2
 
-React Native / Expo mobile application matching the SmartSchool web portal domain and mock-first architecture.
+Professional React Native + TypeScript + Expo client for the SmartSchool SaaS platform.
 
-## Architecture
-- React Native + TypeScript + Expo
-- React Navigation native stack + bottom tabs
-- Feature/module-oriented screens
-- Mock data separated from API client abstractions
-- AsyncStorage session persistence
-- Backend-ready `ApiClient` / `MockApiClient` boundary
-- Same major SmartSchool modules and mock records as the portal
+## Functional mobile scope
 
-## Implemented mobile flows
-- Login/logout and persisted mock session
-- Dashboard and priority navigation
-- Students: search, list, detail, guardian/attendance/prediction
-- Academics
-- Teachers
-- Examinations
-- Attendance
-- Finance
-- HR & Payroll
-- Library
-- Transport
-- Communication
-- AI Intelligence
-- Reports
-- Settings
-- Global cross-module search
-- Notifications linking into modules
-- Clickable module records with detail screens
-- Mock create-record workflows
-- AI Tutor chat mock representing RAG/Ollama integration
-- Responsive phone/tablet layout foundations
+Dashboard, Students, Academics, Teachers, Examinations, Attendance, Finance, HR & Payroll, Library, Transport, Communication, AI Intelligence, Reports and Settings are included. The mobile client also provides global search, notifications, parent-teacher chat, student detail, AI Tutor/grade-prediction mock experiences and role-aware login.
 
-## Demo
-`admin@smartschool.demo`
-`SmartSchool@2026`
+Generic module records now support a real local lifecycle: create, search, open, edit, save, reopen and delete. Changes, notification read state and sent chat messages persist through app restarts using AsyncStorage.
 
-## Run
-```bash
+## Demo login
+
+Email: `admin@smartschool.demo`
+Password: `SmartSchool@2026`
+
+## Install
+
+```powershell
 npm install
-npm start
+npx expo install --fix
 ```
 
-Then use Expo Go, Android emulator, iOS simulator, or Expo web.
+## Run web
+
+```powershell
+npx expo start --web --clear
+```
+
+The web dependencies `react-dom`, `react-native-web`, `@expo/metro-runtime`, `expo-font` and `expo-asset` are declared to avoid the Metro web-resolution problem encountered in the earlier version.
+
+## Run Android
+
+```powershell
+npx expo start --android
+```
+
+or run `npx expo start` and scan the QR code with Expo Go.
 
 ## Backend integration
-Keep screens/components intact and replace mock calls through `src/services/api` with SmartSchool backend endpoints. Authentication can then be switched to IdentityServer/OIDC without changing domain screens.
+
+The app remains decoupled from the backend. Replace the mock persistence implementation behind application state with SmartSchool .NET API adapters and IdentityServer/OIDC without rewriting presentation screens.
