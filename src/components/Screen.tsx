@@ -1,0 +1,3 @@
+import { ReactNode } from "react";import { SafeAreaView,ScrollView,StyleSheet,View } from "react-native";import { theme } from "../theme/theme";import { Toast } from "./Toast";
+export function Screen({children,scroll=true}:{children:ReactNode;scroll?:boolean}){return <SafeAreaView style={s.safe}><View style={s.flex}>{scroll?<ScrollView contentContainerStyle={s.content} keyboardShouldPersistTaps="handled">{children}</ScrollView>:children}<Toast/></View></SafeAreaView>}
+const s=StyleSheet.create({safe:{flex:1,backgroundColor:theme.colors.background},flex:{flex:1},content:{padding:16,paddingBottom:40}})
